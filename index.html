@@ -155,6 +155,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
   <div class="tab" onclick="setTab('stats')" id="tab-stats">
     <div class="tab-icon">📊</div><div class="tab-label">Статистика</div>
   </div>
+  <div class="tab" onclick="setTab('analysis')" id="tab-analysis">
+    <div class="tab-icon">🔬</div><div class="tab-label">Анализ</div>
+  </div>
 </nav>
 
 <script>
@@ -400,6 +403,9 @@ function render(){
   const p1p2St       = data.p1p2_stats||{};
   const tmWr         = tmSt.winrate||0;
   const tmWc         = tmWr>=70?'green':tmWr>=55?'yellow':'red';
+  const tennisSt     = data.tennis_stats||{};
+  const tennisWr     = tennisSt.winrate||0;
+  const tennisWc     = tennisWr>=70?'green':tennisWr>=55?'yellow':'red';
   const esSt         = data.esports_stats||{};
   const esWr         = esSt.winrate||0;
   const esWc         = esWr>=70?'green':esWr>=55?'yellow':'red';
@@ -467,9 +473,9 @@ function render(){
   }
 
   const tabSigs     = tab==='tennis' ? tennisSigs : tab==='esports' ? esportsSigs : footballSigs;
-  const tabSt       = tab==='esports' ? esSt : st;
-  const tabWr       = tab==='esports' ? esWr : wr;
-  const tabWc       = tab==='esports' ? esWc : wc;
+  const tabSt       = tab==='tennis' ? tennisSt : tab==='esports' ? esSt : st;
+  const tabWr       = tab==='tennis' ? tennisWr : tab==='esports' ? esWr : wr;
+  const tabWc       = tab==='tennis' ? tennisWc : tab==='esports' ? esWc : wc;
 
   if(isSignalTab){
     const active=tabSigs.filter(s=>!s.result);
@@ -576,6 +582,89 @@ function render(){
       </div>
       ${dailyHtml}
       <div class="updated">Обновлено: ${data.updated||'—'}</div>`;
+    return;
+  }
+
+  if(tab==='analysis'){
+    const cands = (data.cand_log||[]).filter(c=>c.result);
+    const total = cands.length;
+
+    function cornersGroup(c){
+      if(!c.corners) return 'no_data';
+      const [a,b]=c.corners.split(':').map(Number);
+      const diff=Math.abs(a-b);
+      if(diff===0) return 'eq';
+      if(diff<=2)  return 'small';
+      return 'big';
+    }
+
+    const groups = {
+      eq:      {label:'Равные (0)',   items:[]},
+      small:   {label:'Разница 1–2',  items:[]},
+      big:     {label:'Разница 3+',   items:[]},
+      no_data: {label:'Нет данных',   items:[]},
+    };
+    cands.forEach(c=>groups[cornersGroup(c)].items.push(c));
+
+    function grpStats(items){
+      if(!items.length) return null;
+      const draws=items.filter(c=>c.result==='draw').length;
+      const wr=Math.round(draws/items.length*100);
+      const wc=wr>=65?'green':wr>=50?'yellow':'red';
+      return {draws,total:items.length,wr,wc};
+    }
+
+    const summaryHtml = Object.entries(groups).map(([key,g])=>{
+      const s=grpStats(g.items);
+      if(!s) return '';
+      return `<div class="daily-row">
+        <div class="daily-date" style="width:95px;font-size:11px">${g.label}</div>
+        <div class="daily-bar-wrap">
+          <div class="daily-bar">
+            <div class="daily-bar-w" style="width:${s.wr}%"></div>
+            <div class="daily-bar-l" style="width:${100-s.wr}%"></div>
+          </div>
+          <div class="daily-score">${s.draws}W / ${s.total-s.draws}L · ${s.total} матч.</div>
+        </div>
+        <div class="daily-wr ${s.wc}">${s.wr}%</div>
+      </div>`;
+    }).join('');
+
+    const recentHtml = cands.slice().reverse().slice(0,40).map(c=>{
+      const isDraw = c.result==='draw';
+      const icon   = isDraw?'✅':'❌';
+      const corn   = c.corners||'—';
+      const conf   = c.conf!=null?Math.round(c.conf*100)+'%':'—';
+      const bal    = c.balance!=null?Math.round(c.balance*100)+'%':'—';
+      return `<div class="card" style="padding:10px 12px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;font-weight:600;flex:1">${c.match}</div>
+          <div style="font-size:16px;margin-left:8px">${icon}</div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${c.league||'—'} · ${c.entry_minute||'?'}' · ${c.entry_score||'?'} → ${c.final_score||'?'}</div>
+        <div style="display:flex;gap:10px;margin-top:5px;font-size:11px">
+          <span>🏁 <b>${corn}</b></span>
+          <span>X=${c.d_o||'—'}</span>
+          <span>Бал=${bal}</span>
+          <span>Conf=${conf}</span>
+          ${c.had_signal?'<span style="color:var(--green)">▶ сигнал</span>':''}
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('app').innerHTML=`
+      <div class="header">
+        <div><h1>🔬 Анализ</h1><p>База кандидатов · ${total} матчей</p></div>
+      </div>
+      ${total===0
+        ? `<div class="empty"><div class="empty-icon">🔬</div><div class="empty-text">Данные накапливаются<br>Первые результаты — через несколько часов</div></div>`
+        : `<div class="section-title">Winrate по угловым</div>
+           <div class="daily-list">${summaryHtml}</div>
+           <div class="section-title" style="margin-top:14px">Последние матчи</div>
+           ${recentHtml}`
+      }
+      <div class="updated">Обновлено: ${data.updated||'—'}</div>`;
+    return;
   }
 }
 

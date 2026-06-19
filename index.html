@@ -3,74 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-<title>BettingTest</title>
+<title>Betting Analyzer Pro</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#0f0f13;--card:#1a1a22;--border:rgba(255,255,255,.08);
   --green:#30d158;--red:#ff453a;--yellow:#ff9f0a;--blue:#0a84ff;
-  --text:#f0f0f0;--muted:rgba(255,255,255,.45)
+  --text:#f0f0f0;--muted:rgba(255,255,255,.45);--accent:#eb5015
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,'SF Pro Display',sans-serif}
 .app{max-width:480px;margin:0 auto;padding:14px 12px 80px;min-height:100vh}
 
+/* Header */
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .header h1{font-size:18px;font-weight:700}
 .header p{font-size:11px;color:var(--muted);margin-top:1px}
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
+/* Stats row */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
 .stat-val{font-size:22px;font-weight:700;line-height:1}
 .stat-lbl{font-size:10px;color:var(--muted);margin-top:3px}
 .green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}
-
-.section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;margin-top:6px}
-
-/* Active signal card */
-.card{border-radius:18px;padding:14px;margin-bottom:10px}
-.card-active{background:var(--card);border:1px solid var(--border)}
-.card-active.strong{border-color:rgba(48,209,88,.35);background:linear-gradient(135deg,rgba(48,209,88,.06),var(--card))}
-.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:6px}
-.b-strong{background:rgba(48,209,88,.2);color:var(--green)}
-.b-good{background:rgba(10,132,255,.18);color:var(--blue)}
-.card-meta{font-size:11px;color:var(--muted)}
-.card-match{font-size:15px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-league{font-size:11px;color:var(--muted);margin-bottom:10px}
-.card-bet{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
-.bet-type{font-size:24px;font-weight:800}
-.bet-odds{font-size:17px;font-weight:600;color:var(--muted)}
-.bar-wrap{margin-bottom:8px}
-.bar-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
-.bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
-.bar-fill{height:100%;border-radius:2px}
-.bar-fill.g{background:var(--green)}.bar-fill.b{background:var(--blue)}
-.reasons{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-.reason{font-size:10px;color:var(--muted);background:rgba(255,255,255,.05);border-radius:6px;padding:2px 7px}
-
-/* Result card */
-.card-result{border-radius:18px;padding:14px;margin-bottom:10px}
-.card-win{background:linear-gradient(135deg,rgba(48,209,88,.08),var(--card));border:1px solid rgba(48,209,88,.25)}
-.card-lose{background:linear-gradient(135deg,rgba(255,69,58,.06),var(--card));border:1px solid rgba(255,69,58,.2)}
-.result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.result-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px}
-.result-win{background:rgba(48,209,88,.15);color:var(--green)}
-.result-lose{background:rgba(255,69,58,.15);color:var(--red)}
-.result-time{font-size:10px;color:var(--muted)}
-.result-match{font-size:14px;font-weight:600;margin-bottom:2px}
-.result-league{font-size:11px;color:var(--muted);margin-bottom:8px}
-.result-row{display:flex;align-items:center;justify-content:space-between}
-.result-bet{display:flex;align-items:baseline;gap:8px}
-.result-type{font-size:20px;font-weight:800}
-.result-odds{font-size:14px;color:var(--muted)}
-.result-score{font-size:22px;font-weight:800}
-.result-entry{font-size:10px;color:var(--muted);margin-top:4px}
-
-/* Pending badge */
-.pending-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--yellow);margin-right:5px;animation:blink 1.5s infinite}
 
 /* Streak */
 .streak{background:linear-gradient(135deg,rgba(48,209,88,.1),transparent);border:1px solid rgba(48,209,88,.2);border-radius:14px;padding:11px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
@@ -78,217 +35,533 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 .streak-text{font-size:13px;font-weight:600}
 .streak-sub{font-size:11px;color:var(--muted);margin-top:1px}
 
+.section-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+
 /* Daily stats */
 .daily-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .daily-row{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:11px 14px;display:flex;align-items:center;gap:10px}
-.daily-date{font-size:12px;font-weight:600;min-width:62px}
+.daily-date{font-size:12px;font-weight:600;min-width:62px;color:var(--text)}
 .daily-bar-wrap{flex:1;display:flex;flex-direction:column;gap:3px}
 .daily-bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;display:flex;overflow:hidden}
-.daily-bar-w{background:var(--green)}.daily-bar-l{background:var(--red)}
+.daily-bar-w{background:var(--green);border-radius:2px 0 0 2px}
+.daily-bar-l{background:var(--red);border-radius:0 2px 2px 0}
 .daily-score{font-size:10px;color:var(--muted)}
 .daily-wr{font-size:14px;font-weight:700;min-width:38px;text-align:right}
 
-/* Loading / empty */
-.loading{text-align:center;padding:60px 20px;color:var(--muted)}
-.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:60px 20px;color:var(--muted)}
+/* ── Активная карточка ── */
+.card{border-radius:18px;padding:14px;margin-bottom:10px;transition:all .3s ease}
+.card-active{background:var(--card);border:1px solid var(--border)}
+.card-active.strong{border-color:rgba(48,209,88,.35);background:linear-gradient(135deg,rgba(48,209,88,.06),var(--card))}
+
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.badge{font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 9px;border-radius:6px}
+.b-strong{background:rgba(48,209,88,.2);color:var(--green)}
+.b-good{background:rgba(10,132,255,.18);color:var(--blue)}
+.card-meta{font-size:11px;color:var(--muted)}
+
+.card-match{font-size:15px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-league{font-size:11px;color:var(--muted);margin-bottom:10px}
+
+.card-bet{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.bet-type{font-size:24px;font-weight:800}
+.bet-odds{font-size:17px;font-weight:600;color:var(--muted)}
+
+.bar-wrap{margin-bottom:8px}
+.bar-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.bar{height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.bar-fill.g{background:var(--green)}
+.bar-fill.b{background:var(--blue)}
+
+.reasons{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.reason{font-size:10px;color:var(--muted);background:rgba(255,255,255,.05);border-radius:6px;padding:2px 7px}
+
+/* ── Карточка результата ── */
+.card-result{border-radius:18px;padding:14px;margin-bottom:10px}
+.card-win{background:linear-gradient(135deg,rgba(48,209,88,.12),rgba(48,209,88,.04));border:1px solid rgba(48,209,88,.3)}
+.card-lose{background:linear-gradient(135deg,rgba(255,69,58,.1),rgba(255,69,58,.03));border:1px solid rgba(255,69,58,.25)}
+
+.result-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.result-badge{font-size:13px;font-weight:700}
+.result-badge.result-win{color:var(--green)}
+.result-badge.result-lose{color:var(--red)}
+.result-time{font-size:11px;color:var(--muted)}
+
+.result-match{font-size:13px;font-weight:600;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.result-league{font-size:10px;color:var(--muted);margin-bottom:10px}
+
+.result-row{display:flex;align-items:center;justify-content:space-between}
+.result-bet{display:flex;align-items:baseline;gap:6px}
+.result-type{font-size:20px;font-weight:800}
+.result-odds{font-size:14px;color:var(--muted)}
+.result-score{font-size:20px;font-weight:700;letter-spacing:.04em}
+.result-win .result-score{color:var(--green)}
+.result-lose .result-score{color:var(--red)}
+
+/* Empty */
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
 .empty-icon{font-size:40px;margin-bottom:12px}
-.empty-text{font-size:14px;line-height:1.6}
+.empty-text{font-size:14px;line-height:1.5}
+
+/* Loading */
+.loading{text-align:center;padding:60px 20px;color:var(--muted)}
+.spinner{width:28px;height:28px;border:2.5px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.updated{text-align:center;font-size:10px;color:rgba(255,255,255,.2);margin-top:14px}
 
 /* Tabs */
-.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(15,15,19,.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;justify-content:center;z-index:100}
-.tabs-inner{display:flex;width:100%;max-width:480px}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 0 14px;cursor:pointer;opacity:.45;transition:opacity .2s}
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(15,15,19,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;z-index:100}
+.tab{flex:1;padding:10px 0 14px;text-align:center;cursor:pointer;opacity:.45;transition:opacity .2s}
 .tab.active{opacity:1}
-.tab-icon{font-size:22px}
-.tab-label{font-size:10px;font-weight:600;margin-top:2px}
+.tab-icon{font-size:20px}
+.tab-label{font-size:10px;margin-top:2px}
 
-.updated{font-size:10px;color:rgba(255,255,255,.2);text-align:center;padding:8px 0}
-
-/* Filter badge */
-.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.filter-tag{font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,.07);color:var(--muted);border:1px solid var(--border)}
+/* Paywall */
+.paywall{text-align:center;padding:48px 20px 32px}
+.paywall-lock{font-size:56px;margin-bottom:16px}
+.paywall-title{font-size:24px;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.paywall-sub{font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.paywall-features{text-align:left;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:20px}
+.feature{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px}
+.feature:not(:last-child){border-bottom:1px solid var(--border)}
+.feature-icon{font-size:18px;flex-shrink:0}
+.plan{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.plan.featured{border-color:rgba(48,209,88,.4);background:linear-gradient(135deg,rgba(48,209,88,.08),var(--card))}
+.plan-period{font-size:13px;font-weight:600}
+.plan-period span{font-size:11px;color:var(--muted);font-weight:400}
+.plan-price{font-size:22px;font-weight:800}
+.plan.featured .plan-price{color:var(--green)}
+.paywall-btn{display:block;width:100%;padding:16px;background:var(--green);color:#000;font-size:16px;font-weight:700;border:none;border-radius:16px;cursor:pointer;margin-top:16px;letter-spacing:-.2px}
+.paywall-btn:active{opacity:.85}
+.paywall-note{font-size:11px;color:rgba(255,255,255,.2);margin-top:14px;line-height:1.6}
 </style>
 </head>
 <body>
-<div id="app"><div class="loading"><div class="spinner"></div>Загрузка...</div></div>
+<div class="app" id="app"><div class="loading"><div class="spinner"></div>Загрузка...</div></div>
 <nav class="tabs" id="tabs">
-  <div class="tabs-inner">
-    <div class="tab active" onclick="setTab('signals')" id="tab-signals">
-      <div class="tab-icon">⚽</div><div class="tab-label">Сигналы</div>
-    </div>
-    <div class="tab" onclick="setTab('stats')" id="tab-stats">
-      <div class="tab-icon">📊</div><div class="tab-label">Статистика</div>
-    </div>
+  <div class="tab active" onclick="setTab('signals')" id="tab-signals">
+    <div class="tab-icon">⚽</div><div class="tab-label">Футбол</div>
+  </div>
+  <div class="tab" onclick="setTab('tm')" id="tab-tm">
+    <div class="tab-icon">🎯</div><div class="tab-label">Рынки</div>
+  </div>
+  <div class="tab" onclick="setTab('tennis')" id="tab-tennis">
+    <div class="tab-icon">🎾</div><div class="tab-label">Теннис</div>
+  </div>
+  <div class="tab" onclick="setTab('esports')" id="tab-esports">
+    <div class="tab-icon">🎮</div><div class="tab-label">Киберспорт</div>
+  </div>
+  <div class="tab" onclick="setTab('stats')" id="tab-stats">
+    <div class="tab-icon">📊</div><div class="tab-label">Статистика</div>
   </div>
 </nav>
 
 <script>
-const GIST = 'https://gist.githubusercontent.com/Bandoo12/e05529c4d3a1d9938d6356ca071c8622/raw/signals.json';
-let data = null, tab = 'signals';
+const GIST='https://gist.githubusercontent.com/Bandoo12/d519a85382b8459f7e004e43d56fd0b9/raw/signals.json';
+let data=null, tab='signals';
 
-async function load() {
-  const tg = window.Telegram?.WebApp || null;
-  if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0f0f13'); tg.setBackgroundColor('#0f0f13'); }
-  try {
-    const r = await fetch(GIST + '?t=' + Date.now());
-    data = await r.json();
+function fmtTs(ts){
+  if(!ts)return'—';
+  const d=new Date(ts);
+  if(isNaN(d))return ts;
+  const day=d.getDate(), mon=String(d.getMonth()+1).padStart(2,'0');
+  const hh=String(d.getHours()).padStart(2,'0'), mm=String(d.getMinutes()).padStart(2,'0');
+  return`${day}.${mon} ${hh}:${mm}`;
+}
+
+// ── Достаём userId из всех доступных источников ───────────────────────────────
+function extractUserId(){
+  // 1. Через SDK (стандартный путь)
+  const tgApp=window.Telegram?.WebApp;
+  if(tgApp?.initDataUnsafe?.user?.id) return {uid:tgApp.initDataUnsafe.user.id, src:'sdk'};
+
+  // 2. Напрямую из hash (когда SDK не загрузился)
+  try{
+    const hash=window.location.hash.slice(1);
+    const p=new URLSearchParams(hash);
+    const raw=p.get('tgWebAppData');
+    if(raw){
+      const inner=new URLSearchParams(decodeURIComponent(raw));
+      const userStr=inner.get('user');
+      if(userStr){
+        const u=JSON.parse(decodeURIComponent(userStr));
+        if(u?.id) return {uid:u.id, src:'hash'};
+      }
+    }
+  }catch(e){}
+
+  return {uid:null, src:'none'};
+}
+
+let tg=null, userId=null, uidSrc='none';
+
+// ── Загрузка ──────────────────────────────────────────────────────────────────
+async function load(){
+  tg=window.Telegram?.WebApp||null;
+  if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor('#0f0f13'); tg.setBackgroundColor('#0f0f13'); }
+
+  const {uid,src}=extractUserId();
+  userId=uid; uidSrc=src;
+
+  try{
+    const r=await fetch(GIST+'?t='+Date.now());
+    data=await r.json();
+    const subs=data.subscribers||[];
+    const isSubscriber = userId && subs.map(Number).includes(Number(userId));
+    if(!isSubscriber){showPaywall(subs);return;}
     render();
-  } catch(e) {
-    document.getElementById('app').innerHTML =
-      '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Не удалось загрузить данные</div></div>';
+  }catch(e){
+    document.getElementById('app').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Не удалось загрузить данные</div></div>';
   }
 }
 
-function setTab(t) {
-  tab = t;
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.getElementById('tab-' + t).classList.add('active');
+// ── Paywall ───────────────────────────────────────────────────────────────────
+async function buyPlan(days){
+  const btn = document.getElementById('btn'+days);
+  if(btn){ btn.disabled=true; btn.textContent='Загрузка...'; }
+
+  try {
+    const uid = userId || '';
+    const r   = await fetch(`/api/invoice?days=${days}&user_id=${uid}`);
+    const j   = await r.json();
+    if(!j.url) throw new Error(j.error||'no url');
+
+    if(tg && tg.openInvoice){
+      tg.openInvoice(j.url, status => {
+        if(status === 'paid') tg.close();
+      });
+    } else {
+      window.open(j.url, '_blank');
+    }
+  } catch(e) {
+    alert('Ошибка: ' + e.message);
+  } finally {
+    if(btn){
+      btn.disabled=false;
+      btn.textContent = days===30 ? 'Оформить на 30 дней — 825 ⭐' : 'Оформить на 7 дней — 280 ⭐';
+    }
+  }
+}
+
+function showPaywall(subs){
+  document.getElementById('tabs').style.display='none';
+  const _uid  = String(userId ?? 'undefined');
+  const _subs = JSON.stringify(subs ?? []);
+  const _tg   = tg ? 'есть' : 'нет';
+  const _init = tg?.initData ? tg.initData.slice(0,40)+'…' : 'пусто';
+  document.getElementById('app').innerHTML=`
+    <div class="paywall">
+      <div class="paywall-lock">🔒</div>
+      <div class="paywall-title">Доступ закрыт</div>
+      <div class="paywall-sub">Сигналы 85%+, статистика и аналитика<br>только для подписчиков</div>
+      <div class="paywall-features">
+        <div class="feature"><span class="feature-icon">🎯</span>Точный исход и коэффициент — до матча</div>
+        <div class="feature"><span class="feature-icon">🧠</span>Объяснение простыми словами</div>
+        <div class="feature"><span class="feature-icon">💰</span>Размер ставки по стратегии Келли</div>
+        <div class="feature"><span class="feature-icon">📊</span>Результаты всех прогнозов</div>
+      </div>
+      <div style="margin-top:20px">
+        <button id="btn30" class="paywall-btn" onclick="buyPlan(30)">
+          Оформить на 30 дней — 825 ⭐
+        </button>
+        <button id="btn7" class="paywall-btn" onclick="buyPlan(7)" style="margin-top:10px;background:var(--card);color:var(--text);border:1px solid rgba(255,255,255,.15)">
+          Оформить на 7 дней — 280 ⭐
+        </button>
+      </div>
+      <div class="paywall-note">Отмена в любой момент · ~490 ₽ / ~1 490 ₽<br>Аналитическая информация — без гарантии прибыли</div>
+      <div style="margin-top:16px;padding:10px;background:rgba(255,255,255,.05);border-radius:10px;font-size:10px;color:rgba(255,255,255,.35);text-align:left;word-break:break-all">
+        🔍 Debug<br>
+        userId: ${_uid} (${uidSrc})<br>
+        tg: ${_tg}<br>
+        hash: ${location.hash.slice(0,60)||'пусто'}<br>
+        subs: ${_subs}
+      </div>
+    </div>`;
+}
+
+// ── Навигация ─────────────────────────────────────────────────────────────────
+function setTab(t){
+  tab=t;
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
   render();
 }
 
-function activeCard(s) {
-  const strong = s.confidence >= 75;
-  const reasons = (s.reasons || []).slice(0, 3).map(r => `<span class="reason">${r}</span>`).join('');
-  return `<div class="card card-active${strong ? ' strong' : ''}">
+// ── Карточка активного сигнала ────────────────────────────────────────────────
+function activeCard(s){
+  const strong=s.confidence>=80;
+  const live=s.is_live?'🔴 LIVE':'🕐 Прематч';
+  const mn=s.minute?` · ${s.minute}'`:'';
+  const score=s.score&&s.is_live?` · ${s.score}`:'';
+  const reasons=(s.reasons||[]).slice(0,3).map(r=>`<span class="reason">${r}</span>`).join('');
+  const barCls=strong?'g':'b';
+  return`<div class="card card-active${strong?' strong':''}">
     <div class="card-top">
-      <span class="badge ${strong ? 'b-strong' : 'b-good'}">${strong ? '🔥 СИЛЬНЫЙ' : '⚡ СИГНАЛ'}</span>
-      <span class="card-meta">🔴 LIVE ${s.minute ? s.minute + "'" : ''} · ${s.score || ''}</span>
+      <span class="badge ${strong?'b-strong':'b-good'}">${strong?'🔥 СИЛЬНЫЙ':'⚡ СИГНАЛ'}</span>
+      <span class="card-meta">${live}${mn}${score}</span>
     </div>
     <div class="card-match">${s.match}</div>
-    <div class="card-league">${s.league || '—'} · ${s.ts}</div>
+    <div class="card-league">${s.league||'—'} · ${s.ts}</div>
     <div class="card-bet">
       <span class="bet-type">${s.outcome}</span>
-      <span class="bet-odds">@ ${(s.odds || 0).toFixed(2)}</span>
+      <span class="bet-odds">@ ${(s.odds||0).toFixed(2)}</span>
     </div>
     <div class="bar-wrap">
-      <div class="bar-row"><span>Уверенность ${s.confidence}%</span><span><span class="pending-dot"></span>Ожидает итога</span></div>
-      <div class="bar"><div class="bar-fill ${strong ? 'g' : 'b'}" style="width:${Math.min(100, s.confidence)}%"></div></div>
+      <div class="bar-row"><span>Уверенность ${s.confidence}%</span><span>Грань +${s.edge_pct}%</span></div>
+      <div class="bar"><div class="bar-fill ${barCls}" style="width:${Math.min(100,s.confidence)}%"></div></div>
     </div>
-    ${reasons ? `<div class="reasons">${reasons}</div>` : ''}
+    ${reasons?`<div class="reasons">${reasons}</div>`:''}
   </div>`;
 }
 
-function resultCard(s) {
-  const win = s.result === 'WIN';
-  const icon = win ? '✅' : '❌';
-  const label = win ? 'ПРОШЛО' : 'НЕ ПРОШЛО';
-  const profit = win ? `+${Math.round((s.odds - 1) * 100)}%` : '−100%';
-  return `<div class="card card-result ${win ? 'card-win' : 'card-lose'}">
+// ── Карточка с результатом ────────────────────────────────────────────────────
+function resultCard(s){
+  const win=s.result==='WIN';
+  const cls=win?'card-win':'card-lose';
+  const icon=win?'✅':'❌';
+  const label=win?'ПРОШЛО':'НЕ ПРОШЛО';
+  return`<div class="card card-result ${cls}">
     <div class="result-top">
-      <span class="result-badge ${win ? 'result-win' : 'result-lose'}">${icon} ${label}</span>
-      <span class="result-time">${s.ts}</span>
+      <span class="result-badge ${win?'result-win':'result-lose'}">${icon} ${label}</span>
+      <span class="result-time">${fmtTs(s.ts)}</span>
     </div>
     <div class="result-match">${s.match}</div>
-    <div class="result-league">${s.league || '—'}</div>
+    <div class="result-league">${s.league||'—'}</div>
     <div class="result-row">
       <div class="result-bet">
         <span class="result-type">${s.outcome}</span>
-        <span class="result-odds">@ ${(s.odds || 0).toFixed(2)}</span>
+        <span class="result-odds">@ ${(s.odds||0).toFixed(2)}</span>
       </div>
-      <div class="result-score">${s.final_score || s.score || '—'}</div>
+      <div class="result-score">${s.final_score||s.score||'—'}</div>
     </div>
-    <div class="result-entry">Вход: ${s.entry_score || ''} · ${s.entry_minute ? s.entry_minute + "'" : ''} &nbsp;→&nbsp; Итог: <b>${profit}</b></div>
   </div>`;
 }
 
-function render() {
-  if (!data) return;
-  const st = data.stats || {};
-  const all = data.signals || [];
-
-  if (tab === 'signals') {
-    const active   = all.filter(s => !s.result);
-    const settled  = all.filter(s => s.result).slice(0, 30);
-    const wr = st.winrate || 0;
-    const wc = wr >= 60 ? 'green' : wr >= 45 ? 'yellow' : 'red';
-
-    const statsBlock = st.settled ? `
-      <div class="stats">
-        <div class="stat"><div class="stat-val ${wc}">${wr}%</div><div class="stat-lbl">Winrate</div></div>
-        <div class="stat"><div class="stat-val green">${st.wins || 0}</div><div class="stat-lbl">Побед</div></div>
-        <div class="stat"><div class="stat-val">${st.settled || 0}</div><div class="stat-lbl">Разыграно</div></div>
-      </div>` : '';
-
-    const filterRow = `<div class="filter-row">
-      <span class="filter-tag">⚽ Футбол</span>
-      <span class="filter-tag">⏱ 45–75 мин</span>
-      <span class="filter-tag">X @ 1.70–3.00</span>
+// ── Карточка для маркетов (ТМ 2.5 / П1П2) ───────────────────────────────────
+function marketCard(s, isResult){
+  const isTM   = s.outcome==='ТМ 2.5';
+  const icon   = isTM?'🎯':'🏆';
+  const label  = isTM?'ТМ 2.5':'П1/П2';
+  const odds   = (s.odds||0).toFixed(2);
+  if(isResult){
+    const win  = s.result==='WIN';
+    const cls  = win?'card-win':'card-lose';
+    const ri   = win?'✅':'❌';
+    const rl   = win?'ПРОШЛО':'НЕ ПРОШЛО';
+    return`<div class="card card-result ${cls}">
+      <div class="result-top">
+        <span class="result-badge ${win?'result-win':'result-lose'}">${ri} ${rl}</span>
+        <span class="result-time">${fmtTs(s.ts)}</span>
+      </div>
+      <div class="result-match">${s.match}</div>
+      <div class="result-league">${s.league||'—'}</div>
+      <div class="result-row">
+        <div class="result-bet">
+          <span style="font-size:11px;background:rgba(255,255,255,.08);border-radius:5px;padding:2px 6px;margin-right:6px">${icon} ${label}</span>
+          <span class="result-type">${s.outcome}</span>
+          <span class="result-odds">@ ${odds}</span>
+        </div>
+        <div class="result-score">${s.final_score||s.score||'—'}</div>
+      </div>
     </div>`;
+  }else{
+    return`<div class="card card-active">
+      <div class="card-top">
+        <span class="badge b-good">${icon} ${label}</span>
+        <span class="card-meta">🔴 LIVE · ${s.minute||'—'}'</span>
+      </div>
+      <div class="card-match">${s.match}</div>
+      <div class="card-league">${s.league||'—'} · ${fmtTs(s.ts)}</div>
+      <div class="card-bet">
+        <span class="bet-type">${s.outcome}</span>
+        <span class="bet-odds">@ ${odds}</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted)">Счёт: ${s.score||'—'} · вход: ${s.entry_minute||'—'}'</div>
+    </div>`;
+  }
+}
 
-    let body = '';
-    if (!active.length && !settled.length) {
-      body = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">Сигналов пока нет<br>Бот сканирует матчи каждые 40 сек</div></div>';
-    } else {
-      if (active.length) {
-        body += `<div class="section-title">Активные (${active.length})</div>` + active.map(activeCard).join('');
+// ── Рендер ────────────────────────────────────────────────────────────────────
+function render(){
+  if(!data)return;
+  const st=data.stats||{};
+  const wr=st.winrate||0;
+  const wc=wr>=70?'green':wr>=55?'yellow':'red';
+  const all=data.signals||[];
+
+  // Выбираем данные в зависимости от таба
+  const footballSigs = (data.football||all);
+  const tennisSigs   = (data.tennis||[]);
+  const tmSigs       = (data.tm||[]);
+  const esportsSigs  = (data.esports||[]);
+  const p1p2Sigs     = (data.p1p2||[]);
+  const tmSt         = data.tm_stats||{};
+  const p1p2St       = data.p1p2_stats||{};
+  const tmWr         = tmSt.winrate||0;
+  const tmWc         = tmWr>=70?'green':tmWr>=55?'yellow':'red';
+  const esSt         = data.esports_stats||{};
+  const esWr         = esSt.winrate||0;
+  const esWc         = esWr>=70?'green':esWr>=55?'yellow':'red';
+
+  const isSignalTab = tab==='signals'||tab==='tennis'||tab==='tm'||tab==='esports';
+
+  if(tab==='tm'){
+    // Комбинированная вкладка: ТМ 2.5 + П1/П2
+    const tmActive   = tmSigs.filter(s=>!s.result);
+    const p1Active   = p1p2Sigs.filter(s=>!s.result);
+    const allActive  = [...tmActive,...p1Active].sort((a,b)=>a.ts<b.ts?1:-1);
+    const tmSettled  = tmSigs.filter(s=>s.result).slice().reverse().slice(0,20);
+    const p1Settled  = p1p2Sigs.filter(s=>s.result).slice().reverse().slice(0,20);
+    const allSettled = [...tmSettled,...p1Settled].sort((a,b)=>a.ts<b.ts?1:-1).slice(0,30);
+
+    const p1Wr  = p1p2St.winrate||0;
+    const p1Wc  = p1Wr>=70?'green':p1Wr>=55?'yellow':'red';
+    const tmRoi = tmSt.roi!=null?(tmSt.roi>=0?`+${tmSt.roi}%`:`${tmSt.roi}%`):'—';
+    const p1Roi = p1p2St.roi!=null?(p1p2St.roi>=0?`+${p1p2St.roi}%`:`${p1p2St.roi}%`):'—';
+    const tmRoiCls = (tmSt.roi||0)>=0?'green':'red';
+    const p1RoiCls = (p1p2St.roi||0)>=0?'green':'red';
+
+    let statsHtml='';
+    if((tmSt.settled||0)>0){
+      statsHtml+=`
+      <div class="section-title">ТМ 2.5 · При 0:0 в 50+ мин</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-val ${tmWc}">${tmWr}%</div><div class="stat-lbl">Winrate</div></div>
+        <div class="stat"><div class="stat-val ${tmRoiCls}">${tmRoi}</div><div class="stat-lbl">ROI</div></div>
+        <div class="stat"><div class="stat-val">${tmSt.wins||0}<span style="color:var(--green)">W</span> / ${(tmSt.settled||0)-(tmSt.wins||0)}<span style="color:var(--red)">L</span></div><div class="stat-lbl">Из ${tmSt.settled||0}</div></div>
+      </div>`;
+    }
+    if((p1p2St.settled||0)>0){
+      statsHtml+=`
+      <div class="section-title" style="margin-top:10px">П1/П2 · Лидер в 75+ мин</div>
+      <div class="stats">
+        <div class="stat"><div class="stat-val ${p1Wc}">${p1Wr}%</div><div class="stat-lbl">Winrate</div></div>
+        <div class="stat"><div class="stat-val ${p1RoiCls}">${p1Roi}</div><div class="stat-lbl">ROI</div></div>
+        <div class="stat"><div class="stat-val">${p1p2St.wins||0}<span style="color:var(--green)">W</span> / ${(p1p2St.settled||0)-(p1p2St.wins||0)}<span style="color:var(--red)">L</span></div><div class="stat-lbl">Из ${p1p2St.settled||0}</div></div>
+      </div>`;
+    }
+
+    let body='';
+    if(!allActive.length&&!allSettled.length){
+      body=`<div class="empty"><div class="empty-icon">🎯</div><div class="empty-text">Нет сигналов<br>ТМ 2.5 при 0:0 · П1/П2 при ведении</div></div>`;
+    }else{
+      if(allActive.length){
+        body+=`<div class="section-title" style="margin-top:${statsHtml?14:0}px">Активные</div>`;
+        body+=allActive.map(s=>marketCard(s,false)).join('');
       }
-      if (settled.length) {
-        body += `<div class="section-title" style="margin-top:${active.length?16:0}px">Результаты</div>` + settled.map(resultCard).join('');
+      if(allSettled.length){
+        body+=`<div class="section-title" style="margin-top:${allActive.length?16:statsHtml?14:0}px">Результаты</div>`;
+        body+=allSettled.map(s=>marketCard(s,true)).join('');
       }
     }
 
-    document.getElementById('app').innerHTML = `<div class="app">
+    document.getElementById('app').innerHTML=`
       <div class="header">
-        <div><h1>⚽ BettingTest</h1><p>Стратегия X · 45–75 мин · Dixon-Coles</p></div>
+        <div><h1>🎯 Рынки</h1><p>ТМ 2.5 · П1/П2</p></div>
         <div class="live-dot"></div>
       </div>
-      ${statsBlock}${filterRow}${body}
-      <div class="updated">Обновлено: ${data.updated || '—'}</div>
-    </div>`;
+      ${statsHtml}${body}
+      <div class="updated">Обновлено: ${data.updated||'—'}</div>`;
+    return;
+  }
 
-  } else {
-    // Stats tab
-    const st = data.stats || {};
-    const wr = st.winrate || 0;
-    const wc = wr >= 60 ? 'green' : wr >= 45 ? 'yellow' : 'red';
-    const streak = st.streak || 0;
-    const stype  = st.streak_type;
-    const streakHtml = streak > 1 ? `
+  const tabSigs     = tab==='tennis' ? tennisSigs : tab==='esports' ? esportsSigs : footballSigs;
+  const tabSt       = tab==='esports' ? esSt : st;
+  const tabWr       = tab==='esports' ? esWr : wr;
+  const tabWc       = tab==='esports' ? esWc : wc;
+
+  if(isSignalTab){
+    const active=tabSigs.filter(s=>!s.result);
+    const settled=tabSigs.filter(s=>s.result).reverse().slice(0,30);
+
+    const cur_settled = tabSt.settled||0;
+    const roi = tabSt.roi != null ? tabSt.roi : null;
+    const roiStr = roi != null ? (roi>=0?`+${roi}%`:`${roi}%`) : '—';
+    const roiCls = roi == null ? '' : roi>=0 ? 'green' : 'red';
+    const wr_block=cur_settled?`
+      <div class="stats">
+        <div class="stat"><div class="stat-val ${tabWc}">${tabWr}%</div><div class="stat-lbl">Winrate</div></div>
+        <div class="stat"><div class="stat-val ${roiCls}">${roiStr}</div><div class="stat-lbl">ROI</div></div>
+        <div class="stat"><div class="stat-val green">${tabSt.wins||0}W / <span style="color:var(--red)">${(cur_settled-(tabSt.wins||0))}L</span></div><div class="stat-lbl">Разыграно: ${cur_settled}</div></div>
+      </div>`:'';
+
+    let body='';
+    const sportIcon  = tab==='tennis'?'🎾':tab==='esports'?'🎮':'⚽';
+    const sportTitle = tab==='tennis'?'Теннис':tab==='esports'?'Киберспорт':'Футбол';
+    const sportSub   = tab==='esports'?'EsportsBattle · FC 26 · X (ничья)':'W-5 · Dixon-Coles · xG';
+    const emptyIcon  = tab==='tennis'?'🎾':tab==='esports'?'🎮':'🔍';
+    const emptyText  = tab==='tennis'
+      ? 'Нет теннисных сигналов<br>Сканируем live-матчи АТР/ВТА'
+      : tab==='esports'
+        ? 'Нет esports сигналов<br>Сканируем EsportsBattle FC 26'
+        : 'Сигналов пока нет<br>Система сканирует матчи каждые 30 сек';
+
+    if(!active.length&&!settled.length){
+      body=`<div class="empty"><div class="empty-icon">${emptyIcon}</div><div class="empty-text">${emptyText}</div></div>`;
+    }else{
+      if(active.length){
+        body+=`<div class="section-title">Активные сигналы</div>`;
+        body+=active.map(activeCard).join('');
+      }
+      if(settled.length){
+        body+=`<div class="section-title" style="margin-top:${active.length?16:0}px">Результаты</div>`;
+        body+=settled.map(resultCard).join('');
+      }
+    }
+
+    document.getElementById('app').innerHTML=`
+      <div class="header">
+        <div><h1>${sportIcon} ${sportTitle}</h1><p>${sportSub}</p></div>
+        <div class="live-dot"></div>
+      </div>
+      ${wr_block}${body}
+      <div class="updated">Обновлено: ${data.updated||'—'}</div>`;
+
+  }else{
+    // Статистика
+    const streak=st.streak||0;
+    const stype=st.streak_type;
+    const streakHtml=streak>1?`
       <div class="streak">
-        <div class="streak-icon">${stype === 'WIN' ? '🔥' : '❄️'}</div>
+        <div class="streak-icon">${stype==='WIN'?'🔥':'❄️'}</div>
         <div>
-          <div class="streak-text">${streak} ${stype === 'WIN' ? 'побед' : 'поражений'} подряд</div>
-          <div class="streak-sub">${stype === 'WIN' ? 'Горячая серия!' : 'Ждём сильного сигнала'}</div>
+          <div class="streak-text">${streak} ${stype==='WIN'?'побед':'поражений'} подряд</div>
+          <div class="streak-sub">${stype==='WIN'?'Горячая серия!':'Ждём сильного сигнала'}</div>
         </div>
-      </div>` : '';
+      </div>`:'';
 
-    // daily_stats from gist is an object {"2026-06-15": {wins, losses}}, convert to array
-    const rawDaily = data.daily_stats || {};
-    const days = Object.entries(rawDaily)
-      .map(([date, v]) => {
-        const w = v.wins || 0, l = v.losses || 0, s = w + l;
-        return {date, wins: w, losses: l, settled: s, winrate: s > 0 ? Math.round(w / s * 100) : null};
-      })
-      .sort((a, b) => b.date.localeCompare(a.date));
+    // Блок по дням
+    const days = data.daily_stats||[];
     const MONTHS = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+    function fmtDay(iso){
+      const d=new Date(iso); return `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    }
     const dailyHtml = days.length ? `
-      <div class="section-title">По дням</div>
+      <div class="section-title" style="margin-top:6px">По дням</div>
       <div class="daily-list">
-        ${days.map(d => {
-          const d2 = new Date(d.date);
-          const label = `${d2.getDate()} ${MONTHS[d2.getMonth()]}`;
-          const wc2 = d.winrate === null ? 'yellow' : d.winrate >= 60 ? 'green' : d.winrate >= 45 ? 'yellow' : 'red';
-          const wrLabel = d.winrate === null ? '—' : d.winrate + '%';
-          const wpct = d.settled > 0 ? Math.round(d.wins / d.settled * 100) : 0;
+        ${days.map(d=>{
+          const wc2 = d.winrate===null?'yellow':d.winrate>=60?'green':d.winrate>=45?'yellow':'red';
+          const wrLabel = d.winrate===null?'—':d.winrate+'%';
+          const wpct = d.settled>0 ? Math.round(d.wins/d.settled*100) : 0;
+          const lpct = 100 - wpct;
           return `<div class="daily-row">
-            <div class="daily-date">${label}</div>
+            <div class="daily-date">${fmtDay(d.date)}</div>
             <div class="daily-bar-wrap">
               <div class="daily-bar">
                 <div class="daily-bar-w" style="width:${wpct}%"></div>
-                <div class="daily-bar-l" style="width:${100-wpct}%"></div>
+                <div class="daily-bar-l" style="width:${lpct}%"></div>
               </div>
-              <div class="daily-score">${d.wins}W / ${d.losses}L</div>
+              <div class="daily-score">${d.wins}W / ${d.losses}L · ${d.total} сиг.</div>
             </div>
             <div class="daily-wr ${wc2}">${wrLabel}</div>
           </div>`;
         }).join('')}
       </div>` : '';
 
-    document.getElementById('app').innerHTML = `<div class="app">
+    document.getElementById('app').innerHTML=`
       <div class="header">
-        <div><h1>📊 Статистика</h1><p>BettingTest · X-стратегия</p></div>
+        <div><h1>📊 Статистика</h1><p>История прогнозов</p></div>
       </div>
       ${streakHtml}
       <div class="stats">
@@ -297,18 +570,17 @@ function render() {
         <div class="stat"><div class="stat-val">${st.settled||0}</div><div class="stat-lbl">Разыграно</div></div>
       </div>
       <div class="stats">
-        <div class="stat"><div class="stat-val">${st.total||0}</div><div class="stat-lbl">Всего</div></div>
-        <div class="stat"><div class="stat-val red">${(st.settled||0)-(st.wins||0)}</div><div class="stat-lbl">Проиграно</div></div>
+        <div class="stat"><div class="stat-val">${st.total||0}</div><div class="stat-lbl">Всего сигналов</div></div>
+        <div class="stat"><div class="stat-val red">${(st.settled||0)-(st.wins||0)}</div><div class="stat-lbl">Проигрышей</div></div>
         <div class="stat"><div class="stat-val yellow">${(st.total||0)-(st.settled||0)}</div><div class="stat-lbl">Ожидают</div></div>
       </div>
       ${dailyHtml}
-      <div class="updated">Обновлено: ${data.updated || '—'}</div>
-    </div>`;
+      <div class="updated">Обновлено: ${data.updated||'—'}</div>`;
   }
 }
 
 load();
-setInterval(load, 30000);
+setInterval(load,30000);
 </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Betting Analyzer Pro</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js" async></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -185,6 +185,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-
 const GIST='https://gist.githubusercontent.com/Bandoo12/d519a85382b8459f7e004e43d56fd0b9/raw/signals.json';
 let data=null, tab='signals';
 
+// Call ready() immediately — Telegram Desktop requires this before any async work
+try{ window.Telegram?.WebApp?.ready(); }catch(_){}
+
 function fmtTs(ts){
   if(!ts)return'—';
   const d=new Date(ts);
@@ -223,24 +226,23 @@ let tg=null, userId=null, uidSrc='none';
 // ── Загрузка ──────────────────────────────────────────────────────────────────
 async function load(){
   tg=window.Telegram?.WebApp||null;
-  if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor('#0f0f13'); tg.setBackgroundColor('#0f0f13'); }
+  try{ if(tg){ tg.ready(); tg.expand(); tg.setHeaderColor('#0f0f13'); tg.setBackgroundColor('#0f0f13'); } }catch(_){}
 
   const {uid,src}=extractUserId();
   userId=uid; uidSrc=src;
+
 
   try{
     const r=await fetch(GIST+'?t='+Date.now());
     data=await r.json();
     const subs=data.subscribers||[];
     const subsNums = subs.map(Number);
-    // На десктопном Telegram userId может быть null — разрешаем если юзер в списке ИЛИ если
-    // открыто через WebApp (tg!=null) но userId не получен (специфика desktop)
-    const isSubscriber = (userId && subsNums.includes(Number(userId)))
-                      || (!userId && tg && subs.length > 0);
+    const isSubscriber = tg != null
+                      || (userId && subsNums.includes(Number(userId)));
     if(!isSubscriber){showPaywall(subs);return;}
     render();
   }catch(e){
-    document.getElementById('app').innerHTML='<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Не удалось загрузить данные</div></div>';
+    document.getElementById('app').innerHTML=`<div style="padding:16px;color:red;font-size:12px">ERR: ${e.message}<br>tg=${tg?'yes':'null'} uid=${userId||'null'}</div>`;
   }
 }
 
@@ -298,13 +300,6 @@ function showPaywall(subs){
         </button>
       </div>
       <div class="paywall-note">Отмена в любой момент · ~490 ₽ / ~1 490 ₽<br>Аналитическая информация — без гарантии прибыли</div>
-      <div style="margin-top:16px;padding:10px;background:rgba(255,255,255,.05);border-radius:10px;font-size:10px;color:rgba(255,255,255,.35);text-align:left;word-break:break-all">
-        🔍 Debug<br>
-        userId: ${_uid} (${uidSrc})<br>
-        tg: ${_tg}<br>
-        hash: ${location.hash.slice(0,60)||'пусто'}<br>
-        subs: ${_subs}
-      </div>
     </div>`;
 }
 
@@ -793,8 +788,18 @@ function render(){
   }
 }
 
-load();
-setInterval(load,30000);
+// Wait for Telegram SDK to load (async script), then start
+function startApp(){
+  try{ window.Telegram?.WebApp?.ready(); }catch(_){}
+  load();
+  setInterval(load,30000);
+}
+
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', ()=>setTimeout(startApp,100));
+} else {
+  setTimeout(startApp,100);
+}
 </script>
 </body>
 </html>
